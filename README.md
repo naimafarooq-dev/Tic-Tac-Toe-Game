@@ -1,36 +1,228 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tic-Tac-Toe Game
+
+A modern and responsive Tic-Tac-Toe web application built with **Next.js, TypeScript, Tailwind CSS, and Firebase**.
+
+The game supports **AI gameplay, local multiplayer, and online multiplayer rooms** with real-time game synchronization.
+
+## Features
+
+* Play against AI
+* Three AI difficulty levels:
+
+  * Easy
+  * Medium
+  * Hard
+* Local multiplayer for two players
+* Online multiplayer using Firebase
+* Create and share online game rooms
+* Real-time game synchronization
+* Player identification for online games
+* Winning-cell highlighting
+* Game score tracking
+* Draw detection
+* Game restart and reset options
+* Sound effects for moves, wins, draws, and game events
+* Responsive design for desktop and mobile devices
+* Game state saved using browser local storage
+* Video call component for online gameplay
+
+## Tech Stack
+
+### Frontend
+
+* Next.js 15
+* React 19
+* TypeScript
+* Tailwind CSS 4
+
+### Backend & Services
+
+* Firebase
+* Firebase Firestore
+
+### Development Tools
+
+* Node.js
+* npm
+* Git
+* GitHub
+* Vercel
+
+## Project Structure
+
+```text
+tic-tac-toe/
+│
+├── app/
+│   ├── game/
+│   │   └── [roomId]/
+│   │       └── page.tsx
+│   └── ...
+│
+├── components/
+│   ├── Online/
+│   │   ├── OnlineError.tsx
+│   │   ├── OnlineGame.tsx
+│   │   ├── OnlineGameStatus.tsx
+│   │   ├── OnlineHeader.tsx
+│   │   ├── OnlineLoading.tsx
+│   │   ├── OnlinePlayerInfo.tsx
+│   │   └── OnlineRoomInfo.tsx
+│   │
+│   ├── GameBoard.tsx
+│   ├── GameMode.tsx
+│   ├── DifficultySelector.tsx
+│   ├── ScoreBoard.tsx
+│   ├── ShareGame.tsx
+│   ├── TicTacToe.tsx
+│   └── VideoCall.tsx
+│
+├── hooks/
+│   ├── useGameRoom.ts
+│   ├── useOnlineMove.ts
+│   └── usePlayerId.ts
+│
+├── lib/
+│   ├── ai.ts
+│   ├── gameLogic.ts
+│   ├── gameRoom.ts
+│   ├── gameSounds.ts
+│   └── firebase.ts
+│
+├── types/
+│   └── game.ts
+│
+├── public/
+│
+├── firebase.rules
+├── package.json
+└── tsconfig.json
+```
+
+## Game Modes
+
+### AI Mode
+
+Play against a computer-controlled opponent with selectable difficulty levels.
+
+### Local Multiplayer
+
+Two players can play on the same device by taking turns as **X** and **O**.
+
+### Online Multiplayer
+
+Create an online game room and share the room with another player.
+
+The online mode uses **Firebase Firestore** to synchronize:
+
+* Board state
+* Current player
+* Player assignments
+* Winner
+* Draw status
+* Game status
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/naimafarooq-dev/Tic-Tac-Toe-Game.git
+```
+
+### 2. Navigate to the Project
+
+```bash
+cd Tic-Tac-Toe-Game
+```
+
+### 3. Install Dependencies
+
+```bash
+npm install
+```
+
+### 4. Configure Firebase
+
+Create a `.env.local` file in the project root:
+
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+```
+
+Replace the values with the Firebase configuration from your Firebase project.
+
+**Do not commit `.env.local` to GitHub.**
+
+### 5. Run the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Build
 
-## Learn More
+To create a production build:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+To start the production server:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm start
+```
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The application can be deployed using **Vercel**.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Before deployment, make sure the required Firebase environment variables are configured in the deployment platform.
+
+## Firebase
+
+The online multiplayer functionality uses Firebase Firestore for real-time room data.
+
+Firestore security rules are included in the repository.
+
+The application stores online game rooms in the:
+
+```text
+gameRooms
+```
+
+collection.
+
+## Future Improvements
+
+* Improve AI strategy
+* Add player authentication
+* Add online player profiles
+* Add game history
+* Add room expiration
+* Improve video calling functionality
+* Add additional game themes
+* Add tournament mode
+
+## Live Demo
+
+Try the deployed application:
+
+**[Tic-Tac-Toe Game](https://tic-tac-toe-navy-chi-86.vercel.app/)**
+
+
+## License
+
+This project currently does not include a specific open-source license.
