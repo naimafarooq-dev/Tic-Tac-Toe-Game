@@ -1,4 +1,4 @@
-import OnlineGame from "@/components/OnlineGame";
+import OnlineGame from "@/components/Online/OnlineGame";
 
 export default async function GameRoom({
   params,
@@ -9,8 +9,5 @@ export default async function GameRoom({
 }) {
   const { roomId } = await params;
 
-  return (
-    <OnlineGame roomId={roomId} />
-  );
+  return <OnlineGame roomId={roomId} />;
 }
-

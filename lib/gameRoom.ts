@@ -1,10 +1,7 @@
 import {
-  addDoc,
-  collection,
   doc,
   getDoc,
-  serverTimestamp,
-  updateDoc,
+  setDoc,
 } from "firebase/firestore";
 
 import { db } from "@/lib/firebase";
@@ -13,6 +10,10 @@ import type {
   CellValue,
   GameRoom,
 } from "@/types/game";
+
+/* =========================================================
+   CONSTANTS
+========================================================= */
 
 const EMPTY_BOARD: CellValue[] = [
   "",
@@ -26,100 +27,191 @@ const EMPTY_BOARD: CellValue[] = [
   "",
 ];
 
+/* =========================================================
+   GET ROOM REFERENCE
+========================================================= */
+
+export function getRoomRef(
+  roomId: string
+) {
+  return doc(
+    db,
+    "gameRooms",
+    roomId
+  );
+}
+
+/* =========================================================
+   GENERATE ROOM ID
+========================================================= */
+
+function generateRoomId(): string {
+  return Math.random()
+    .toString(36)
+    .substring(2, 8)
+    .toUpperCase();
+}
+
+/* =========================================================
+   CREATE GAME ROOM
+========================================================= */
+
 /**
- * Firebase mein new game room create karta hai.
+ * Creates a new online game room.
+ *
+ * A unique room ID is generated automatically.
+ * The player who creates the room becomes Player X.
  */
-export const createGameRoom = async (
-  playerX: string
-): Promise<string> => {
-  const gameRoom: GameRoom = {
-    board: [...EMPTY_BOARD],
+export async function createGameRoom(
+  playerId: string
+): Promise<string> {
+  let roomId = "";
+  let roomExists = true;
 
-    currentPlayer: "X",
+  /*
+   * Generate a room ID until
+   * an unused ID is found.
+   */
+  while (roomExists) {
+    roomId =
+      generateRoomId();
 
-    playerX,
+    const roomRef =
+      getRoomRef(roomId);
 
-    playerO: null,
+    const snapshot =
+      await getDoc(roomRef);
 
-    winner: null,
+    roomExists =
+      snapshot.exists();
+  }
 
-    isDraw: false,
+  /* -------------------------------------------------------
+     CREATE ROOM DATA
+  ------------------------------------------------------- */
 
-    status: "waiting",
+  const room: GameRoom = {
+    board: [
+      ...EMPTY_BOARD,
+    ],
 
-    createdAt: serverTimestamp(),
+    currentPlayer:
+      "X",
+
+    playerX:
+      playerId,
+
+    playerO:
+      null,
+
+    winner:
+      null,
+
+    isDraw:
+      false,
+
+    status:
+      "waiting",
   };
 
-  const roomRef = await addDoc(
-    collection(db, "gameRooms"),
-    gameRoom
+  /* -------------------------------------------------------
+     SAVE ROOM TO FIREBASE
+  ------------------------------------------------------- */
+
+  await setDoc(
+    getRoomRef(roomId),
+    room
   );
 
-  return roomRef.id;
-};
+  return roomId;
+}
+
+/* =========================================================
+   CREATE ROOM WITH SPECIFIC ID
+========================================================= */
 
 /**
- * Existing game room Firebase se retrieve karta hai.
+ * Creates a room using a provided room ID.
+ *
+ * This function is kept separately from createGameRoom()
+ * because some parts of the application may need to create
+ * or initialize a room using a known ID.
  */
-export const getGameRoom = async (
-  roomId: string
-): Promise<GameRoom | null> => {
-  const roomRef = doc(
-    db,
-    "gameRooms",
-    roomId
-  );
-
-  const roomSnapshot =
-    await getDoc(roomRef);
-
-  if (!roomSnapshot.exists()) {
-    return null;
-  }
-
-  return roomSnapshot.data() as GameRoom;
-};
-
-/**
- * Friend ko existing game room mein
- * Player O ke taur par join karwata hai.
- */
-export const joinGameRoom = async (
+export async function createRoom(
   roomId: string,
-  playerO: string
-): Promise<boolean> => {
-  const roomRef = doc(
-    db,
-    "gameRooms",
-    roomId
-  );
+  playerId: string
+): Promise<void> {
+  const roomRef =
+    getRoomRef(roomId);
 
-  const roomSnapshot =
+  const snapshot =
     await getDoc(roomRef);
 
-  if (!roomSnapshot.exists()) {
-    return false;
+  /* -------------------------------------------------------
+     ROOM ALREADY EXISTS
+  ------------------------------------------------------- */
+
+  if (snapshot.exists()) {
+    return;
   }
 
-  const room =
-    roomSnapshot.data() as GameRoom;
+  /* -------------------------------------------------------
+     CREATE ROOM DATA
+  ------------------------------------------------------- */
 
-  // Room already full hai
-  if (room.playerO !== null) {
-    return false;
-  }
+  const room: GameRoom = {
+    board: [
+      ...EMPTY_BOARD,
+    ],
 
-  // Room finished hai
-  if (room.status === "finished") {
-    return false;
-  }
+    currentPlayer:
+      "X",
 
-  // Player O assign karo
-  await updateDoc(roomRef, {
-    playerO,
-    status: "playing",
-  });
+    playerX:
+      playerId,
 
-  return true;
-};
+    playerO:
+      null,
 
+    winner:
+      null,
+
+    isDraw:
+      false,
+
+    status:
+      "waiting",
+  };
+
+  /* -------------------------------------------------------
+     SAVE ROOM
+  ------------------------------------------------------- */
+
+  await setDoc(
+    roomRef,
+    room
+  );
+}
+
+/* =========================================================
+   UPDATE ROOM
+========================================================= */
+
+/**
+ * Updates one or more fields of an existing game room.
+ *
+ * merge: true ensures that fields not included in `data`
+ * remain unchanged in Firestore.
+ */
+export async function updateRoom(
+  roomId: string,
+  data: Partial<GameRoom>
+): Promise<void> {
+  await setDoc(
+    getRoomRef(roomId),
+    data,
+    {
+      merge: true,
+    }
+  );
+}
