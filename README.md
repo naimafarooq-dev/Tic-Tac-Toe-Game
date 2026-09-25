@@ -205,17 +205,6 @@ gameRooms
 
 collection.
 
-## Future Improvements
-
-* Improve AI strategy
-* Add player authentication
-* Add online player profiles
-* Add game history
-* Add room expiration
-* Improve video calling functionality
-* Add additional game themes
-* Add tournament mode
-
 ## Live Demo
 
 Try the deployed application:
